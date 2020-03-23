@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <LangVersion>8</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Convey.CQRS.Commands" Version="0.4.273" />
+    <PackageReference Include="Convey.CQRS.Events" Version="0.4.273" />
+    <PackageReference Include="Convey.CQRS.Queries" Version="0.4.273" />
+    <PackageReference Include="Valit" Version="2.0.0" />
+  </ItemGroup>
+
+</Project>
