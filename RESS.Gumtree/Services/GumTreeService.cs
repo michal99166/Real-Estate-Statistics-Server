@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Convey.Persistence.MongoDB;
+using Microsoft.Extensions.Logging;
 using RESS.Gumtree.DTO;
 using RESS.Gumtree.Exceptions;
 using RESS.Gumtree.Mongo;
@@ -11,11 +13,14 @@ namespace RESS.Gumtree.Services
     public class GumTreeService : IGumTreeService
     {
         private readonly IMongoRepository<GumtreeTopicDocument, Guid> _repository;
+        private readonly ILogger<GumTreeService> _logger;
 
-        public GumTreeService(IMongoRepository<GumtreeTopicDocument, Guid> repository)
+        public GumTreeService(IMongoRepository<GumtreeTopicDocument, Guid> repository, ILogger<GumTreeService> logger)
         {
             _repository = repository;
+            _logger = logger;
         }
+
         public async Task<GumtreeTopicDto> GetAsync(Guid id)
         {
             var document = await _repository.GetAsync(id);

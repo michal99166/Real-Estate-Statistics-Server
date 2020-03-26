@@ -15,8 +15,6 @@ namespace RESS.Gumtree.Validators
                     .Required())
                 .Ensure(c => c.Url, _ => _
                     .Required())
-                .Ensure(c => c.Price, _ => _
-                    .Required())
                 .For(dto)
                 .Validate();
 
