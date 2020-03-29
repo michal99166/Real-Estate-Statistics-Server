@@ -8,6 +8,7 @@ namespace RESS.Gumtree.Mongo.Documents
     {
         public Guid Id { get; set; }
         public DateTime TimeStamp { get; set; }
+        public DateTime LastUpdate { get; set; }
         public DateTime? CreatedDate { get; set; }
         public string Title { get; set; }
         public double Price { get; set; }

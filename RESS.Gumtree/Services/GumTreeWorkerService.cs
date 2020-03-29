@@ -16,56 +16,63 @@ namespace RESS.Gumtree.Services
     {
         private readonly IMongoRepository<GumtreeTopicDocument, Guid> _repository;
         private readonly ILogger<GumTreeWorkerService> _logger;
+        private readonly IMongoDatabase _database;
 
-        public GumTreeWorkerService(IMongoRepository<GumtreeTopicDocument, Guid> repository, ILogger<GumTreeWorkerService> logger)
+        public GumTreeWorkerService(IMongoRepository<GumtreeTopicDocument, Guid> repository, ILogger<GumTreeWorkerService> logger, IMongoDatabase database)
         {
             _repository = repository;
             _logger = logger;
+            _database = database;
         }
 
         public async Task CreateAsync(GumtreeTopicDto dto)
         {
-            if (await _repository.ExistsAsync(c => c.Url == dto.Url && c.Price != dto.Price))
+            var collection = _database.GetCollection<GumtreeTopicDocument>("GumTreeTopics").AsQueryable().OrderBy(x => x.TimeStamp).Where(x => x.Url == dto.Url).ToList();
+            if (!collection.Any())
             {
-                await _repository.AddAsync(dto.AsRelatedDocument());
-                _logger.LogWarning($"Ogłoszenie istnieje w bazie {dto.Id}, ale wykryto różnice cen.");
+                await _repository.AddAsync(dto.AsDocument());
                 return;
             }
 
-            var result = await _repository.GetAsync(c => c.Url == dto.Url);
-            if (result is {})
+            var firstDocument = collection.ElementAt(0);
+            var lastDocument = collection.TakeLast(1).FirstOrDefault(c => c.Url == dto.Url && c.Price != dto.Price);
+
+            if (lastDocument is { })
             {
-                var document = dto.AsUpdateDocument();
-                await _repository.UpdateAsync(document);
-                _logger.LogWarning($"Zaktualizowano dokument {dto.Id}.");
+                await _repository.UpdateAsync(firstDocument.AsUpdateParentDocument());
+                await _repository.AddAsync(dto.AsRelatedDocument(firstDocument.Id));
+                _logger.LogWarning($"Ogłoszenie istnieje w bazie {firstDocument.Id}, ale wykryto różnice cen.");
                 return;
             }
 
-            await _repository.AddAsync(dto.AsDocument());
+            if (firstDocument is { })
+            {
+                await _repository.UpdateAsync(firstDocument.AsUpdateDocument());
+            }
         }
 
         public async Task CreateAsync(IEnumerable<GumtreeTopicDto> dto)
         {
-                foreach (var d in dto)
+            foreach (var d in dto)
+            {
+                if (await _repository.ExistsAsync(c => c.Url == d.Url && c.Price != d.Price))
                 {
-                    if (await _repository.ExistsAsync(c => c.Url == d.Url && c.Price != d.Price))
-                    {
-                        _logger.LogWarning($"Ogłoszenie istnieje w bazie {d.Url}, ale wykryto różnice cen.");
-                        await _repository.AddAsync(d.AsDocument());
-                        return;
-                    }
-                    if (await _repository.ExistsAsync(c => c.Url == d.Url))
-                    {
-                        return;
-                    }
-
+                    _logger.LogWarning($"Ogłoszenie istnieje w bazie {d.Url}, ale wykryto różnice cen.");
                     await _repository.AddAsync(d.AsDocument());
+                    return;
                 }
+                if (await _repository.ExistsAsync(c => c.Url == d.Url))
+                {
+                    return;
+                }
+
+                await _repository.AddAsync(d.AsDocument());
+            }
         }
 
         public Task<int> CountOfAllTopicAsync()
         {
-            return Task.Run(()=>_repository.Collection.AsQueryable().Count());
+            return Task.Run(() => _repository.Collection.AsQueryable().Count());
         }
     }
 }

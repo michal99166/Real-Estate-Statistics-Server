@@ -1,32 +1,35 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using RESS.Gumtree.Workers.Generators;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using RESS.Gumtree.Infrastructure;
-using RESS.Gumtree.Workers.Generators;
 
 namespace RESS.Gumtree.Workers
 {
     public class GumTreeHostedService : IHostedService
     {
         private readonly ILogger<GumTreeHostedService> _logger;
-        private readonly GumtreeOption _option;
+        private readonly IHostApplicationLifetime _lifetime;
         private readonly IPagesGenerator _pagesGenerator;
         private readonly IGumTreeTopicDownloader _gumTreeTopicDownloader;
-
-        public GumTreeHostedService(ILogger<GumTreeHostedService> logger, GumtreeOption option, IPagesGenerator pagesGenerator,
-            IGumTreeTopicDownloader gumTreeTopicDownloader)
+        public GumTreeHostedService(ILogger<GumTreeHostedService> logger, IHostApplicationLifetime lifetime, IPagesGenerator pagesGenerator, IGumTreeTopicDownloader gumTreeTopicDownloader)
         {
             _logger = logger;
-            _option = option;
+            _lifetime = lifetime;
             _pagesGenerator = pagesGenerator;
             _gumTreeTopicDownloader = gumTreeTopicDownloader;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
+        {
+            
+            _lifetime.ApplicationStarted.Register(() => OnStarted(cancellationToken));
+            _lifetime.ApplicationStopping.Register(() => OnStopping(cancellationToken));
+
+        }
+
+        private async Task OnStarted(CancellationToken cancellationToken)
         {
             do
             {
@@ -35,6 +38,11 @@ namespace RESS.Gumtree.Workers
 
                 await Task.Delay(10000, cancellationToken);
             } while (!cancellationToken.IsCancellationRequested);
+        }
+
+        private async Task OnStopping(CancellationToken cancellationToken)
+        {
+            await StopAsync(cancellationToken);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

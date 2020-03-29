@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Convey.CQRS.Queries;
 using Convey.Persistence.MongoDB;
 using Microsoft.Extensions.Logging;
 using RESS.Gumtree.DTO;
@@ -26,6 +27,8 @@ namespace RESS.Gumtree.Services
             var document = await _repository.GetAsync(id);
             return document?.AsDto();
         }
+
+
 
         public async Task CreateAsync(GumtreeTopicDto dto)
         {

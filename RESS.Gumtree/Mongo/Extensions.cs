@@ -34,19 +34,25 @@ namespace RESS.Gumtree.Mongo
             return document;
         }
 
-        public static GumtreeTopicDocument AsRelatedDocument(this GumtreeTopicDto dto)
+        public static GumtreeTopicDocument AsRelatedDocument(this GumtreeTopicDto dto, Guid parentGuid)
         {
             var document = DtoToDocument(dto);
-            document.RelatedId = dto.Id;
+            document.RelatedId = parentGuid;
             document.PriceChanged = true;
             return document;
         }
 
-        public static GumtreeTopicDocument AsUpdateDocument(this GumtreeTopicDto dto)
+        public static GumtreeTopicDocument AsUpdateParentDocument(this GumtreeTopicDocument firstDocument)
         {
-            var document = DtoToDocument(dto);
-            document.Id = dto.Id;
-            return document;
+            firstDocument.LastUpdate = DateTime.Now;
+            firstDocument.PriceChanged = true;
+            firstDocument.RelatedId = firstDocument.Id;
+            return firstDocument;
+        }
+        public static GumtreeTopicDocument AsUpdateDocument(this GumtreeTopicDocument firstDocument)
+        {
+            firstDocument.LastUpdate = DateTime.Now;
+            return firstDocument;
         }
 
         public static GumtreeTopicDto AsDto(this GumtreeTopicDocument document)
