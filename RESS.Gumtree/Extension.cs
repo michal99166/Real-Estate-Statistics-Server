@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using Convey;
+using Convey.CQRS.Commands;
+using Convey.CQRS.Queries;
 using Convey.Persistence.MongoDB;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,7 +24,6 @@ namespace RESS.Gumtree
             builder.Services.AddHostedService<GumTreeHostedService>();
             builder.Services.AddSingleton<IGumTreeDtoValidator, GumTreeTopicDtoValidator>();
             builder.Services.AddSingleton<IGumTreeService, GumTreeService>();
-            builder.Services.AddSingleton<IGumTreeWorkerService, GumTreeWorkerService>();
             builder.Services.AddSingleton<IPagesGenerator, PagesGenerator>();
             builder.Services.AddSingleton<IGumTreeTopicDownloader, GumTreeTopicDownloader>();
             builder.Services.AddControllers().AddNewtonsoftJson();
@@ -40,7 +41,11 @@ namespace RESS.Gumtree
         {
             var requestsOptions = builder.GetOptions<GumtreeOption>("gumtreeOptions");
             builder.Services.AddSingleton(requestsOptions);
-            return builder;
+            return builder
+                .AddQueryHandlers()
+                .AddInMemoryQueryDispatcher()
+                .AddCommandHandlers()
+                .AddInMemoryCommandDispatcher();
         }
     }
 }

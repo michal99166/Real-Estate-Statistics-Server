@@ -5,34 +5,41 @@ using RESS.Gumtree.Validators;
 using RESS.Shared.Exceptions;
 using System;
 using System.Threading.Tasks;
+using Convey.CQRS.Commands;
+using Convey.CQRS.Queries;
+using RESS.Gumtree.Cqrs.Queries;
 
 namespace RESS.Gumtree.Controllers
 {
-    [Route("api/gumtree")]
+    [Route("api/[controller]")]
     [ApiController]
     public class GumTreeController : ControllerBase
     {
         private readonly IGumTreeService _service;
         private readonly IGumTreeDtoValidator _validator;
+        private readonly IQueryDispatcher _queryDispatcher;
+        private readonly ICommandDispatcher _commandDispatcher;
 
-        public GumTreeController(IGumTreeService service, IGumTreeDtoValidator validator)
+        public GumTreeController(IGumTreeService service, IGumTreeDtoValidator validator, IQueryDispatcher queryDispatcher, ICommandDispatcher commandDispatcher)
         {
             _service = service;
             _validator = validator;
+            _queryDispatcher = queryDispatcher;
+            _commandDispatcher = commandDispatcher;
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<GumtreeTopicDto>> Get(Guid id)
+        [HttpGet("{id}", Name = "GetById")]
+        public async Task<ActionResult<GumtreeTopicDto>> GetById(GetById query)
         {
-            var topic = await _service.GetAsync(id).ThrowIfNotFoundAsync();
-            return Ok(topic);
+            var result = await _queryDispatcher.QueryAsync(query);
+            return Ok(result);
         }
 
-        [HttpGet()]
-        public async Task<ActionResult<GumtreeTopicDto>> Get()
+        [HttpGet("city" , Name = "GetByCity")]
+        public async Task<ActionResult<PagedResult<GumtreeTopicDto>>> GetByCity([FromBody] GetByCity query)
         {
-            var cinema = await _service.GetAsync(new Guid()).ThrowIfNotFoundAsync();
-            return Ok(cinema);
+            var result = await _queryDispatcher.QueryAsync(query);
+            return Ok(result);
         }
 
         [HttpPost]

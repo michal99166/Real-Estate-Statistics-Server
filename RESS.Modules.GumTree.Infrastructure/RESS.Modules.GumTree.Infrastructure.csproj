@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Convey" Version="0.4.281" />
+    <PackageReference Include="Convey.Persistence.MongoDB" Version="0.4.281" />
+    <PackageReference Include="Convey.WebApi.CQRS" Version="0.4.281" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RESS.Modules.GumTree.Application\RESS.Modules.GumTree.Application.csproj" />
+  </ItemGroup>
+
+</Project>

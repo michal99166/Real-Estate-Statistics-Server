@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Convey" Version="0.4.273" />
+    <PackageReference Include="Convey" Version="0.4.281" />
     <PackageReference Include="Convey.Logging" Version="0.4.273" />
     <PackageReference Include="Convey.WebApi" Version="0.4.273" />
     <PackageReference Include="Convey.WebApi.CQRS" Version="0.4.273" />

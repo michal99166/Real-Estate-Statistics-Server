@@ -9,8 +9,6 @@ namespace RESS.Gumtree.Validators
             => ValitRules<GumtreeTopicDto>
                 .Create()
                 .WithStrategy(s => s.Complete)
-                .Ensure(c => c.Id, _ => _
-                    .IsNotEmpty())
                 .Ensure(c => c.Title, _ => _
                     .Required())
                 .Ensure(c => c.Url, _ => _

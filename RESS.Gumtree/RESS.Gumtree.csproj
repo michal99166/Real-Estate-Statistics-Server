@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Convey" Version="0.4.273" />
+    <PackageReference Include="Convey" Version="0.4.281" />
     <PackageReference Include="Convey.Logging" Version="0.4.273" />
     <PackageReference Include="Convey.Persistence.MongoDB" Version="0.4.273" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.23" />
@@ -18,6 +18,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RESS.Shared\RESS.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Cqrs\Commands\" />
+    <Folder Include="Cqrs\CommandsHandlers\" />
   </ItemGroup>
 
 </Project>

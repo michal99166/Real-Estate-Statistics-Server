@@ -19,11 +19,11 @@ namespace RESS.Gumtree.Workers
     public class GumTreeTopicDownloader : IGumTreeTopicDownloader
     {
         private static ILogger<GumTreeTopicDownloader> _logger;
-        private readonly IGumTreeWorkerService _gumTreeService;
+        private readonly IGumTreeService _gumTreeService;
         private readonly GumtreeOption _option;
         private int countFoundedTopic;
 
-        public GumTreeTopicDownloader(ILogger<GumTreeTopicDownloader> logger, IGumTreeWorkerService gumTreeService, GumtreeOption option)
+        public GumTreeTopicDownloader(ILogger<GumTreeTopicDownloader> logger, IGumTreeService gumTreeService, GumtreeOption option)
         {
             _logger = logger;
             _gumTreeService = gumTreeService;
